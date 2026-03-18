@@ -1,0 +1,13 @@
+# 데이터 파일(용량이슈)
+data/raw/
+data/db/
+*.csv
+*.db
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# 환경
+.env
