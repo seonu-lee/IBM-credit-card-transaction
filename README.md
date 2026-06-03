@@ -113,6 +113,14 @@ Recency · Frequency · Monetary 점수화 후 5개 세그먼트 분류
 - 실제 데이터 기반 Activation율을 벤치마크로 활용
 - z-test 기반 시뮬레이션으로 유의미한 개선 효과 검증
 
+- 수치 불일치 노트
+  : AARRR 퍼널의 Activation(66.0%)과 A/B 테스트 대조군 전환율(67.7%) 간 차이는 분석 대상 모집단이 다르기 때문이다.
+
+  - AARRR: clean_transactions 기준 전체 유저 1,657명
+  - A/B 테스트: RFM 세그멘테이션과 일관성을 유지하기 위해 cohort_year >= 2002 조건을 적용한 유저만 대상으로 함
+
+  2002년 이전 코호트 유저는 관측 기간이 길어 데이터 특성이 상이하므로 제외하였으며, 해당 유저들의 Activation율이 상대적으로 낮아 이들을 제외하면 전체 비율이 소폭 상승한다.
+
 ### 8. MySQL 업로드 (`06_mysql_upload.ipynb`)
 
 - 50명 샘플 데이터를 MySQL에 적재
