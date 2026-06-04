@@ -143,6 +143,21 @@ Recency · Frequency · Monetary 점수화 후 5개 세그먼트 분류
 
 ---
 
+##  Looker Studio 대시보드
+
+[🔗 대시보드 바로가기](https://datastudio.google.com/reporting/ba79357c-b0f6-4900-b35c-360ff3679b70)
+
+BigQuery와 직접 연결된 자동 새로고침 대시보드
+
+- AARRR 퍼널 — Activation 66%, Retention 97.5%
+- 연도별 거래 추이 (1991~2019)
+- Cohort별 유저당 평균 거래금액 변화
+- RFM 세그먼트 분포
+- 세그먼트별 평균 연간 거래금액
+- A/B 테스트 — Activation율 개선 시뮬레이션
+
+---
+
 ##  주요 인사이트
 
 - **높은 Retention(97.5%)**: 한 번 정착한 유저는 이탈이 거의 없음. 신규 유저 Activation 전략이 핵심 레버
