@@ -1,5 +1,8 @@
+# IBM 신용카드 거래 데이터 분석 - 노트북 코드 정리
 
-[notebooks\01_data_loading.ipynb]
+## notebooks/01_data_loading.ipynb
+
+```python
 import pandas as pd
 import sqlite3
 import os
@@ -45,15 +48,25 @@ for table in ['transactions', 'users', 'cards']:
     print(f"{table}: {count['cnt'].values[0]:,}행")
 
 conn.close()
+```
 
-[notebooks\02_eda.ipynb]
+---
+
+## notebooks/02_eda.ipynb
+
+### Cell 2 - 테이블 기본 구조 확인
+
+```python
 # Cell 2 - 테이블 기본 구조 확인
 
 for table in ['transactions', 'users', 'cards']:
     count = pd.read_sql(f"SELECT COUNT(*) as cnt FROM {table}", conn)
     print(f"{table}: {count['cnt'].values[0]:,}행")
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 3 - transactions 샘플 확인
+
+```python
 # Cell 3 - transactions 샘플 확인
 
 trans_sample = pd.read_sql("SELECT * FROM transactions LIMIT 5", conn)
@@ -61,16 +74,22 @@ print("=== 컬럼 목록 ===")
 print(trans_sample.columns.tolist())
 print("\n=== 샘플 데이터 ===")
 print(trans_sample)
+```
 
-[notebooks\02_eda.ipynb]
+### users 테이블 구조 확인
+
+```python
 # users 테이블 구조 확인
 users_sample = pd.read_sql("SELECT * FROM users LIMIT 5", conn)
 print("=== 컬럼 목록 ===")
 print(users_sample.columns.tolist())
 print("\n=== 샘플 데이터 ===")
 print(users_sample)
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 4 - 데이터 범위 파악
+
+```python
 # Cell 4 - 데이터 범위 파악
 
 range_query = """
@@ -85,8 +104,11 @@ SELECT
 FROM transactions
 """
 print(pd.read_sql(range_query, conn))
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 5 - Amount 전처리 확인
+
+```python
 # Cell 5 - Amount 전처리 확인
 
 amount_query = """
@@ -100,8 +122,11 @@ SELECT
 FROM transactions
 """
 print(pd.read_sql(amount_query, conn))
+```
 
-[notebooks\02_eda.ipynb]
+### 음수 거래 상세 확인
+
+```python
 # 음수 거래 상세 확인
 negative_query = """
 SELECT
@@ -120,8 +145,11 @@ LIMIT 20
 """
 neg_df = pd.read_sql(negative_query, conn)
 print(neg_df)
+```
 
-[notebooks\02_eda.ipynb]
+### 음수 거래에서 오류 동반 비율
+
+```python
 # 음수 거래에서 오류 동반 비율
 negative_error_query = """
 SELECT
@@ -134,8 +162,11 @@ GROUP BY errors
 ORDER BY cnt DESC
 """
 print(pd.read_sql(negative_error_query, conn))
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 6 - 사기 거래 비율
+
+```python
 # Cell 6 - 사기 거래 비율
 
 fraud_query = """
@@ -147,8 +178,11 @@ FROM transactions
 GROUP BY "Is Fraud?"
 """
 print(pd.read_sql(fraud_query, conn))
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 7 - Errors? 결측치 패턴
+
+```python
 # Cell 7 - Errors? 결측치 패턴
 
 error_query = """
@@ -161,8 +195,11 @@ GROUP BY "Errors?"
 ORDER BY count DESC
 """
 print(pd.read_sql(error_query, conn))
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 8 - 전처리된 분석용 뷰 생성
+
+```python
 # Cell 8 - 전처리된 분석용 뷰 생성
 
 create_view_query = """
@@ -198,8 +235,11 @@ conn.commit()
 check = pd.read_sql("SELECT COUNT(*) as cnt FROM clean_transactions", conn)
 print(f"clean_transactions: {check['cnt'].values[0]:,}행")
 print(f"제외된 사기 거래: {24386900 - check['cnt'].values[0]:,}건")
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 9 - LTV용 뷰 (추가로 환불·오류 제외)
+
+```python
 # Cell 9 - LTV용 뷰 (추가로 환불·오류 제외)
 
 create_ltv_view_query = """
@@ -215,8 +255,11 @@ conn.commit()
 
 check_ltv = pd.read_sql("SELECT COUNT(*) as cnt FROM ltv_transactions", conn)
 print(f"ltv_transactions: {check_ltv['cnt'].values[0]:,}행")
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 10 - 결측치 확인
+
+```python
 # Cell 10 - 결측치 확인
 
 null_query = """
@@ -232,8 +275,11 @@ FROM clean_transactions
 """
 print("=== 결측치 확인 ===")
 print(pd.read_sql(null_query, conn))
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 11 - 이상치 확인 (Amount)
+
+```python
 # Cell 11 - 이상치 확인 (Amount)
 
 outlier_query = """
@@ -250,8 +296,11 @@ WHERE Amount > 0
 """
 print("=== Amount 이상치 확인 ===")
 print(pd.read_sql(outlier_query, conn))
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 12 - MCC 카테고리 분석
+
+```python
 # Cell 12 - MCC 카테고리 분석
 
 mcc_query = """
@@ -269,8 +318,11 @@ LIMIT 20
 print("=== MCC Top 20 ===")
 mcc_df = pd.read_sql(mcc_query, conn)
 print(mcc_df)
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 15 - 연도별 거래 추이
+
+```python
 # Cell 15 - 연도별 거래 추이
 
 yearly_query = """
@@ -287,8 +339,11 @@ ORDER BY Year
 """
 yearly = pd.read_sql(yearly_query, conn)
 print(yearly)
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 16 - 2020년 데이터 월 범위 확인
+
+```python
 # Cell 16 - 2020년 데이터 월 범위 확인
 
 year_month_query= """
@@ -301,8 +356,11 @@ GROUP BY year_month
 """
 year_month_df = pd.read_sql(year_month_query, conn)
 print(year_month_df)
+```
 
-[notebooks\02_eda.ipynb]
+### Cell 18 - 2020년 제외한 최종 분석 뷰 재생성
+
+```python
 # Cell 18 - 2020년 제외한 최종 분석 뷰 재생성
 
 # 기존 뷰 삭제 후 재생성
@@ -350,8 +408,15 @@ conn.commit()
 for view in ['clean_transactions', 'ltv_transactions']:
     count = pd.read_sql(f"SELECT COUNT(*) as cnt FROM {view}", conn)
     print(f"{view}: {count['cnt'].values[0]:,}행")
+```
 
-[notebooks\03_aarrr_funnel.ipynb]
+---
+
+## notebooks/03_aarrr_funnel.ipynb
+
+### Cell 2 - Acquisition: 연도별 신규 유저 수
+
+```python
 # Cell 2 - Acquisition: 연도별 신규 유저 수
 
 acquisition_query = """
@@ -372,8 +437,11 @@ ORDER BY first_year
 acquisition = pd.read_sql(acquisition_query, conn)
 print("=== Acquisition: 연도별 신규 유저 ===")
 print(acquisition)
+```
 
-[notebooks\03_aarrr_funnel.ipynb]
+### 유저 수 확인 쿼리
+
+```python
 # 유저 수 확인 쿼리
 
 # 1. 전체 transactions에서 유저 수
@@ -391,8 +459,11 @@ print(f"2020년 제외 후 유저 수: {q3['cnt'].values[0]}")
 # 4. users 테이블
 q4 = pd.read_sql("SELECT COUNT(DISTINCT person) as cnt FROM users", conn)
 print(f"users 테이블 유저 수: {q4['cnt'].values[0]}")
+```
 
-[notebooks\03_aarrr_funnel.ipynb]
+### Cell 4 - Activation: 첫 거래 후 30일 이내 재거래 비율
+
+```python
 # Cell 4 - Activation: 첫 거래 후 30일 이내 재거래 비율
 
 activation_query = """
@@ -433,8 +504,11 @@ LEFT JOIN second_tx s ON f.User = s.User
 activation = pd.read_sql(activation_query, conn)
 print("=== Activation ===")
 print(activation)
+```
 
-[notebooks\03_aarrr_funnel.ipynb]
+### Cell 5 - Retention: 첫 거래 다음 연도에도 거래한 유저 비율
+
+```python
 # Cell 5 - Retention: 첫 거래 다음 연도에도 거래한 유저 비율
 
 retention_query = """
@@ -465,8 +539,11 @@ LEFT JOIN next_year_tx n ON f.User = n.User
 retention = pd.read_sql(retention_query, conn)
 print("=== Retention (1년 후) ===")
 print(retention)
+```
 
-[notebooks\03_aarrr_funnel.ipynb]
+### Cell 6 - Revenue: 유저별 총 거래금액
+
+```python
 # Cell 6 - Revenue: 유저별 총 거래금액
 
 revenue_query = """
@@ -489,8 +566,11 @@ FROM (
 revenue = pd.read_sql(revenue_query, conn)
 print("=== Revenue ===")
 print(revenue)
+```
 
-[notebooks\03_aarrr_funnel.ipynb]
+### Cell 8 - Activation × Retention 교차 분석
+
+```python
 # Cell 8 - Activation × Retention 교차 분석
 
 cross_query = """
@@ -546,8 +626,11 @@ ORDER BY user_count DESC
 cross = pd.read_sql(cross_query, conn)
 print("=== Activation × Retention 유저 세그멘테이션 ===")
 print(cross)
+```
 
-[notebooks\03_aarrr_funnel.ipynb]
+### Cell 10 - AARRR 순차 FUNNEL
+
+```python
 # Cell 10 - AARRR 순차 FUNNEL
 
 funnel_query = """
@@ -591,8 +674,15 @@ print("=== 순차 퍼널 ===")
 print(funnel)
 print(f"\nAcquisition → Activation : {funnel['activation'].values[0]/funnel['acquisition'].values[0]*100:.1f}%")
 print(f"Activation  → Retention  : {funnel['retention'].values[0]/funnel['activation'].values[0]*100:.1f}%")
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+---
+
+## notebooks/04_cohort_ltv.ipynb
+
+### Cell 2 - Cohort 기준 정의
+
+```python
 # Cell 2 - Cohort 기준 정의
 # 유저별 첫 거래 연도 (30년치 데이터라서 월 말고 연도로 구분)= Cohort 기준
 
@@ -608,8 +698,11 @@ cohort_base = pd.read_sql(cohort_base_query, conn)
 print(f"전체 유저 수: {len(cohort_base):,}명")
 print(f"Cohort 연도 범위: {cohort_base['cohort_year'].min()} ~ {cohort_base['cohort_year'].max()}")
 print(cohort_base['cohort_year'].value_counts().sort_index()) # Cohort별 유저 수 확인
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### Cell 3 - Cohort Retention Matrix 계산
+
+```python
 # Cell 3 - Cohort Retention Matrix 계산
 
 cohort_retention_query = """
@@ -653,8 +746,11 @@ ORDER BY ua.cohort_year, ua.years_since_first
 cohort_data = pd.read_sql(cohort_retention_query, conn)
 print(f"데이터 shape: {cohort_data.shape}")
 print(cohort_data.head(20))
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### 확인용 쿼리
+
+```python
 # 확인용 쿼리
 check_query = """
 WITH cohort_base AS (
@@ -669,8 +765,11 @@ GROUP BY cohort_year
 ORDER BY cohort_year
 """
 print(pd.read_sql(check_query, conn))
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### Cell 3 수정 - Cohort Retention Matrix
+
+```python
 # Cell 3 수정 - Cohort Retention Matrix
 
 cohort_retention_query = """
@@ -719,8 +818,11 @@ cohort_data = pd.read_sql(cohort_retention_query, conn)
 # 2002년 코호트 유저 수 확인
 print("코호트별 유저 수 확인:")
 print(cohort_data[cohort_data['years_since_first']==0][['cohort_year','cohort_users']])
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### Cell 6 - 코호트별 거래 빈도·금액 변화
+
+```python
 # Cell 6 - 코호트별 거래 빈도·금액 변화
 
 cohort_behavior_query = """
@@ -761,8 +863,11 @@ cohort_behavior = pd.read_sql(cohort_behavior_query, conn)
 # 확인
 print("2002년 코호트 유저 수:", cohort_behavior[cohort_behavior['cohort_year']==2002]['cohort_users'].values[0])
 print(cohort_behavior.head(10))
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### 2011, 2012년 코호트 유저 특성 확인
+
+```python
 # 2011, 2012년 코호트 유저 특성 확인
 check_query = """
 SELECT
@@ -782,8 +887,11 @@ GROUP BY cb.cohort_year
 ORDER BY cb.cohort_year
 """
 print(pd.read_sql(check_query, conn))
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### 실제 관찰된 평균 사용 기간
+
+```python
 # 실제 관찰된 평균 사용 기간
 actual_lifespan_query = """
 WITH cohort_base AS (
@@ -808,9 +916,11 @@ GROUP BY cohort_year
 ORDER BY cohort_year
 """
 print(pd.read_sql(actual_lifespan_query, conn))
+```
 
+### Cell 10 - 기간 보정 연간 LTV 계산
 
-[notebooks\04_cohort_ltv.ipynb]
+```python
 # Cell 10 - 기간 보정 연간 LTV 계산
 
 ltv_query = """
@@ -860,8 +970,11 @@ JOIN user_revenue ur ON fc.User = ur.User
 ltv_df = pd.read_sql(ltv_query, conn)
 print(f"LTV 계산 완료: {len(ltv_df):,}명")
 print(ltv_df.describe())
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### Cell 12 - RFM 계산
+
+```python
 # Cell 12 - RFM 계산
 
 rfm_query = """
@@ -895,8 +1008,11 @@ GROUP BY c.User
 rfm_df = pd.read_sql(rfm_query, conn)
 print(f"RFM 계산 완료: {len(rfm_df):,}명")
 print(rfm_df.describe())
+```
 
-[notebooks\04_cohort_ltv.ipynb]
+### Cell 16 - 세그먼트별 행동 비교
+
+```python
 # Cell 16 - 세그먼트별 행동 비교
 
 # rfm_df에 segment 붙여서 transactions와 조인
@@ -931,8 +1047,15 @@ behavior_df = behavior_df.merge(
 )
 print(f"행동 데이터: {len(behavior_df):,}행")
 display(behavior_df['segment'].value_counts())
+```
 
-[notebooks\05_ab_test.ipynb]
+---
+
+## notebooks/05_ab_test.ipynb
+
+### Cell 1 - 라이브러리 및 DB 연결
+
+```python
 # notebooks/05_ab_test.ipynb
 # Cell 1 - 라이브러리 및 DB 연결
 
@@ -947,8 +1070,11 @@ import seaborn as sns
 DB_PATH = r'..\data\db\fintech.db'
 conn = sqlite3.connect(DB_PATH)
 print("DB 연결 완료")
+```
 
-[notebooks\05_ab_test.ipynb]
+### Cell 5 - 실제 데이터 기반 시뮬레이션 준비
+
+```python
 # Cell 5 - 실제 데이터 기반 시뮬레이션 준비
 # 첫 거래 후 30일 내 재거래 여부 데이터 추출
 
@@ -989,8 +1115,11 @@ activation_df = pd.read_sql(activation_query, conn)
 print(f"전체 유저: {len(activation_df):,}명")
 print(f"Activated: {activation_df['activated'].sum():,}명")
 print(f"실제 Activation율: {activation_df['activated'].mean():.4f} ({activation_df['activated'].mean()*100:.1f}%)")
+```
 
-[notebooks\05_ab_test.ipynb]
+### Cell 6 앞에 추가 - rfm_df 다시 계산
+
+```python
 # Cell 6 앞에 추가 - rfm_df 다시 계산
 
 rfm_query = """
@@ -1049,8 +1178,11 @@ def classify_rfm(row):
 rfm_df['segment'] = rfm_df.apply(classify_rfm, axis=1)
 print(f"RFM 완료: {len(rfm_df):,}명")
 print(rfm_df['segment'].value_counts())
+```
 
-[notebooks\05_ab_test.ipynb]
+### Cell 8 - z-test 통계 검정
+
+```python
 # Cell 8 - z-test 통계 검정
 
 from statsmodels.stats.proportion import proportions_ztest, proportion_confint
@@ -1076,8 +1208,15 @@ ci_treatment = proportion_confint(
 
 print(f"\n대조군 95% 신뢰구간: [{ci_control[0]:.3f}, {ci_control[1]:.3f}]")
 print(f"실험군 95% 신뢰구간: [{ci_treatment[0]:.3f}, {ci_treatment[1]:.3f}]")
+```
 
-[notebooks\06_mysql_upload.ipynb]
+---
+
+## notebooks/06_mysql_upload.ipynb
+
+### 샘플 200명 추출 및 Tableau용 CSV 저장
+
+```python
 # VS Code에서 실행
 # notebooks/06_mysql_upload.ipynb
 
@@ -1124,8 +1263,11 @@ trans_sample.to_csv(r'..\data\raw\trans_sample.csv', index=False)
 users_sample.to_csv(r'..\data\raw\users_sample.csv', index=False)
 cards_sample.to_csv(r'..\data\raw\cards_sample.csv', index=False)
 print("CSV 저장 완료!")
+```
 
-[notebooks\06_mysql_upload.ipynb]
+### transactions 50명 샘플 MySQL 업로드
+
+```python
 import pandas as pd
 import sqlite3
 import random
@@ -1162,8 +1304,11 @@ trans_50.to_sql(
     chunksize=50000
 )
 print(f"완료! {len(trans_50):,}행")
+```
 
-[notebooks\06_mysql_upload.ipynb]
+### users, cards 50명 샘플 MySQL 업로드
+
+```python
 import pandas as pd
 import sqlite3
 import random
@@ -1199,8 +1344,11 @@ engine = create_engine('mysql+pymysql://root:**@localhost:3306/ibm_card_analysis
 users_50.to_sql('users', engine, if_exists='replace', index=False)
 cards_50.to_sql('cards', engine, if_exists='replace', index=False)
 print("완료!")
+```
 
-[notebooks\06_mysql_upload.ipynb]
+### Tableau용 CSV 추출 (SQLite 전체 데이터 기반)
+
+```python
 # Tableau용 CSV 추출 (SQLite 전체 데이터 기반)
 import pandas as pd
 import sqlite3
@@ -1357,8 +1505,15 @@ print("6. MCC 카테고리 완료")
 
 conn.close()
 print("\n전체 CSV 추출 완료! data/tableau/ 폴더 확인해봐요")
+```
 
-[notebooks\07_bigquery_upload.ipynb]
+---
+
+## notebooks/07_bigquery_upload.ipynb
+
+### BigQuery 클라이언트 초기화
+
+```python
 import pandas as pd
 from google.cloud import bigquery
 from pathlib import Path
@@ -1371,8 +1526,11 @@ DATA_DIR = Path("../data/tableau")
 # BigQuery 클라이언트 초기화 (ADC 자동 참조)
 client = bigquery.Client(project=PROJECT_ID)
 print(f"인증 완료: {client.project}")
+```
 
-[notebooks\07_bigquery_upload.ipynb]
+### Tableau용 CSV → BigQuery 업로드
+
+```python
 def upload_csv_to_bq(file_name: str, table_name: str):
     file_path = DATA_DIR / file_name
     df = pd.read_csv(file_path)
@@ -1402,8 +1560,11 @@ targets = [
 
 for file_name, table_name in targets:
     upload_csv_to_bq(file_name, table_name)
+```
 
-[notebooks\07_bigquery_upload.ipynb]
+### GCS 버킷 연결
+
+```python
 from google.cloud import storage
 
 # GCS 설정
@@ -1415,8 +1576,11 @@ storage_client = storage.Client(project=PROJECT_ID)
 bucket = storage_client.bucket(BUCKET_NAME)
 
 print(f"GCS 버킷 연결 완료: {BUCKET_NAME}")
+```
 
-[notebooks\07_bigquery_upload.ipynb]
+### 원본 CSV → GCS 업로드
+
+```python
 import os
 
 def upload_to_gcs(file_name: str):
@@ -1437,8 +1601,11 @@ raw_files = [
 
 for file_name in raw_files:
     upload_to_gcs(file_name)
+```
 
-[notebooks\07_bigquery_upload.ipynb]
+### GCS → BigQuery 로드
+
+```python
 def load_gcs_to_bq(file_name: str, table_name: str):
     uri = f"gs://{BUCKET_NAME}/{file_name}"
     table_id = f"{PROJECT_ID}.{DATASET_ID}.{table_name}"
@@ -1466,3 +1633,4 @@ targets = [
 
 for file_name, table_name in targets:
     load_gcs_to_bq(file_name, table_name)
+```
