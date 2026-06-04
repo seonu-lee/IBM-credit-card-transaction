@@ -134,11 +134,12 @@
 |---|---|---|
 | Acquisition | 첫 거래 발생 유저 | 1,657명 |
 | Activation | 첫 거래 후 30일 내 재거래 | 1,093명 (66.0%) |
-| Retention | Activation 유저 중 다음 연도 재거래 | 1,066명 (97.5%) |
+| Retention | Acquisition 전체 유저 중 다음 연도 재거래 | 1,614명 (97.5%) |
 | Revenue | 카드 특성상 Acquisition과 동일 | 1,657명 |
 | Referral | 데이터 없음 → 스킵 | - |
 
-- **결과**: **Activation(66%)이 유일한 이탈 구간**. Activation된 유저의 **97.5%가 장기 전환** → 초기 30일이 lifecycle의 핵심 분기점.
+- **결과**: 첫 거래 유저의 97.5%는 Activation 통과 여부와 무관하게 다음 연도에도 거래를 유지한다. 신용카드 락인(lock-in) 효과가 강하게 작용하기 때문으로 해석할 수 있다. 병목은 유저를 붙잡는 것이 아니라, 첫 30일 안에 얼마나 적극적으로 쓰게 만드느냐에 있다.
+
 - **유저 4분류**: 진성 유저 64.3% / 느린 정착형 31.3% / 이탈 2.8% / 초반 반짝 1.6%.
 
 ### 4.4 Cohort 분석
@@ -366,7 +367,6 @@
 **다시 한다면**
 - 실제 알림 파일럿 설계까지 포함해 시뮬레이션 → 실측 전환.
 - BG/NBD·Kaplan-Meier로 예측형 LTV 고도화.
-- BigQuery + Looker Studio로 자동 갱신 모니터링 체계 구축 *(현재 향후 방향으로 진행)*.
 - `users`/`cards` 테이블(FICO·소득·카드등급)을 결합해 세그먼트 해석 심화.
 
 ---
@@ -385,9 +385,12 @@
 ---
 
 ### 부록 A. 첨부 파일 외 / 확인 필요 항목
-- **BigQuery + Looker Studio 자동 갱신 대시보드**: 첨부 3개 파일에는 미기재. 향후 방향/진행 중으로만 표기함. 포트폴리오 반영 시 진행 상태 확정 후 기술 권장.
-- **A/B 대조군 67.7% vs AARRR 66.0% 차이**: 시뮬레이션 베이스라인 산정 방식 차이로 추정 → 면접 대비 산정 기준 정리 필요.
+- **BigQuery + Looker Studio 자동 갱신 대시보드**: 완성됨. GCS 경유로 원본 데이터(2,400만 행) BigQuery 적재 완료, View 기반 SQL 분석 완료, Looker Studio 대시보드 완성. 
+🔗 https://datastudio.google.com/reporting/ba79357c-b0f6-4900-b35c-360ff3679b70
+
+- **A/B 대조군 67.7% vs AARRR 66.0% 차이**: 원인 확인 완료. RFM 분석과 일관성을 맞추기 위해 cohort_year >= 2002 조건을 적용한 유저만 A/B 테스트 대상으로 삼았기 때문이다. 2002년 이전 코호트를 제외하면 Activation율이 소폭 상승해 67.7%가 된다. 다만 이 조건은 A/B 테스트 맥락에서 논리적 근거가 약하다는 한계가 있으며, 1.7%p 차이라 결론에 실질적인 영향은 없다.
+
 - **Tableau 대시보드 수치 vs 보고서 수치**: 대시보드 Activation 1,093명·Retention 1,066명과 보고서 수치 일치 확인됨.
 
 ### 부록 B. 기술 스택 한 줄 요약
-`Python 3.11` `pandas/numpy` `scipy/statsmodels` `SQLite` `MySQL` `SQLAlchemy` `Matplotlib/Seaborn` `Tableau Public` `Git/GitHub`
+`Python 3.11` `pandas/numpy` `scipy/statsmodels` `SQLite` `MySQL` `SQLAlchemy` `Matplotlib/Seaborn` `Tableau Public` `Git/GitHub` `BigQuery` `Google Cloud Storage` `Looker Studio` `gcloud CLI` `Git/GitHub`
